@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+    <head>
+       <title>小朋友做数学题</title>
+       <style type="text/css">
+           .container {
+               margin: 5px auto;
+               text-align: center;
+               position: relative;
+               width:100%;
+               height:100%;
+           }
+       </style>
+        <script type="text/javascript">
+        class RandomExpr{
+            constructor(cfg) {
+                this.max = cfg.max
+                this.opts = cfg.opts
+            }
+
+            createExpr(){
+                let p=document.createElement("p");
+                let operator = this.randomOp(this.opts)
+                let factors = {}
+                // 如果是减号，要求减数比被减数大
+                if (operator == '-'){
+                    factors = this.randomFactorForMinus(this.max)
+                }else if(operator == '÷'){
+                    factors = this.randomFactorForMinus(this.max)
+                    factors.a = factors.a - factors.a%b
+                }else{
+                    factors = this.randomFactor(this.max)
+                }
+                p.innerHTML=""+factors.a+" " + operator+" "+factors.b+" =&nbsp;&nbsp;&nbsp;&nbsp;";
+                return p
+            }
+
+            randomOp(){
+                return this.opts.charAt(Math.floor(Math.random()*this.opts.length))
+            }
+
+            randomFactorForMinus(max){
+                let factor = {a:0,b:0}
+                while(factor.a == factor.b){
+                    factor = this.randomFactor(max)
+                }
+                if (factor.a < factor.b){
+                    let tmp = factor.a
+                    return {a:factor.b,b:tmp}
+                }else{
+                    return factor
+                }
+            }
+
+            randomFactor(){
+                let a = Math.round(Math.random()*this.max)
+                let b = Math.round(Math.random()*this.max)
+
+                return {a:a,b:b}
+            }
+
+        }
+
+
+        function createVerticalTable(cfg) {
+            let re = new RandomExpr(cfg)
+            let table = document.createElement("table")
+            for(let i=1;i<cfg.rows;i++){
+                let tr = document.createElement('tr')
+                let th = document.createElement('th')
+                th.appendChild(re.createExpr())
+                tr.appendChild(th)
+                table.appendChild(tr)
+            }
+            let tr1 = document.createElement('tr')
+            let th1 = document.createElement('th')
+            th1.innerHTML = "共"+cfg.rows+"道"
+            tr1.appendChild(th1)
+            table.appendChild(tr1)
+
+            let tr2 = document.createElement('tr')
+            let th2 = document.createElement('th')
+            th2.innerHTML = "答对&nbsp;&nbsp;道"
+            tr2.appendChild(th2)
+            table.appendChild(tr2)
+
+
+            return table
+        }
+        function createTable(cfg){
+            let table = document.createElement("table")
+
+            let tr = document.createElement("tr")
+            for(let i=1;i<=cfg.columns;i++){
+                let th = document.createElement("th")
+                th.appendChild(createVerticalTable(cfg))
+                tr.appendChild(th)
+            }
+            table.appendChild(tr)
+
+            table.totalCnt = cfg.rows*cfg.columns
+            return table
+        }
+        function create(){
+            let div1=document.getElementById('div1');
+            div1.innerHTML="";
+            let cfg = {
+                max: document.getElementById('txt').value,
+                opts: document.getElementById('opts').value,
+                rows: 12,
+                columns:6,
+            }
+
+            let table = createTable(cfg)
+            div1.appendChild(table)
+
+            let footer =document.getElementById('footer');
+            let hr = document.createElement('hr')
+            let summary = document.createElement('div')
+            summary.innerHTML="共有"+table.totalCnt+"道"
+            footer.innerHTML=""
+            footer.appendChild(hr)
+            footer.appendChild(summary)
+            footer.style.display='inline'
+        }
+        </script>
+    </head>
+    <body>
+        <div>
+            <p>小朋友学数学-加减运算</p>
+        </div>
+        <div id="table1">
+            <table>
+                <tr>
+                    <td>计算范围</td>
+                     <td>
+                        <select id="txt">
+                         <option value="10">10以内</option>
+                         <option value="20">20以内</option>
+                         <option value="30">30以内</option>
+                         <option value="100">100以内</option>
+                         </select>
+                     </td>
+                    <td>运算符</td>
+                    <td>
+                        <select id="opts">
+                            <option value="+-">仅加减</option>
+                            <option value="+-x÷">加减乘除</option>
+                        </select>
+                    </td>
+                 </tr>
+            </table>
+        </div>
+        <div>
+            <p>
+                <input id="button" type="button" value="开始计算" onClick="create()">
+            </p>
+         </div>
+        <div id="div1" class="container"></div>
+        <div id="footer" style="display: none">
+        </div>
+    </body>
+</html>
